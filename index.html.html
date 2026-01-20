@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小森林兒科診所 - 關東熱海花火5日</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        morandi: {
+                            light: '#E0E5DF', /* 淺莫蘭迪綠 */
+                            DEFAULT: '#8FBC8F', /* 莫蘭迪綠主色 */
+                            dark: '#6F8F72', /* 深莫蘭迪綠 */
+                        },
+                        cream: {
+                            light: '#FFFDF5', /* 更亮的奶油白 */
+                            DEFAULT: '#FDF6E3', /* 溫暖的奶油色 (主要背景) */
+                            dark: '#E6DCCF', /* 拿鐵色 */
+                            accent: '#F2E6D8' /* 裝飾用 */
+                        },
+                        text: {
+                            main: '#4A5568',
+                            light: '#718096'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans TC', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Force full viewport height specifically for mobile browsers */
+        body {
+            height: 100vh; /* Fallback */
+            height: 100dvh; /* Dynamic viewport height for mobile address bars */
+            background-color: #FDFBF7;
+            color: #4A5568;
+            overflow: hidden; /* Prevent body scroll, handle in main */
+        }
+
+        .tab-active {
+            background-color: #8FBC8F;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .tab-inactive {
+            background-color: white;
+            color: #8FBC8F;
+            border: 1px solid #E0E5DF;
+        }
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+            border-left: 5px solid #8FBC8F;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        /* Special style for meal cards */
+        .card-meal {
+            background-color: #FFFEFA;
+            border-left-color: #F6E05E; /* Yellow for meals */
+        }
+        .timeline-line {
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #E0E5DF;
+            z-index: 0;
+        }
+        .hide {
+            display: none;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom scrollbar for horizontal tabs on mobile */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Recommendation Link Button */
+        .rec-link {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 4px;
+            font-size: 0.75rem;
+            color: #4A5568;
+            background-color: #EDF2F7;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            text-decoration: none;
+            border: 1px solid #CBD5E0;
+        }
+        .rec-link:hover {
+            background-color: #CBD5E0;
+            color: #2D3748;
+        }
+        .rec-item {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #E2E8F0;
+        }
+        .rec-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+    </style>
+</head>
+<!-- Use flex-col and h-screen to create a fixed header + scrollable content layout -->
+<body class="flex flex-col font-sans">
+
+    <!-- Fixed Top Section (Header + Tabs) -->
+    <!-- z-50 ensures it stays on top visually, shadow-md gives depth over scrolling content -->
+    <div class="flex-none z-50 shadow-md relative">
+        <!-- Header -->
+        <header class="bg-cream-DEFAULT text-text-main p-5 relative overflow-hidden border-b-4 border-morandi-light">
+            <!-- Decorative Background Icons -->
+            <i class="fa-solid fa-cloud text-white absolute top-[-10px] left-[-20px] text-8xl opacity-80 transform rotate-12"></i>
+            <i class="fa-solid fa-cloud text-white absolute bottom-[-20px] right-[-10px] text-9xl opacity-60"></i>
+            <i class="fa-solid fa-sun text-yellow-300/80 absolute top-[-15px] right-[10%] text-6xl animate-spin" style="animation-duration: 12s;"></i>
+            
+            <!-- Floating Cute Elements -->
+            <i class="fa-solid fa-plane-up text-morandi absolute top-6 right-6 text-xl animate-bounce" style="animation-duration: 3s;"></i>
+            <i class="fa-solid fa-leaf text-morandi-dark absolute bottom-4 left-12 text-2xl opacity-50 transform -rotate-45"></i>
+            <i class="fa-solid fa-camera text-morandi absolute top-1/2 left-4 text-3xl opacity-20 transform -translate-y-1/2 rotate-12"></i>
+            
+            <div class="container mx-auto max-w-2xl text-center relative z-10">
+                <div class="flex justify-center items-center gap-2 mb-1">
+                     <div class="bg-white/80 p-2 rounded-full shadow-sm backdrop-blur-sm">
+                        <i class="fa-solid fa-tree text-morandi-dark text-lg"></i>
+                     </div>
+                     <h1 class="text-xl md:text-2xl font-bold tracking-wide text-morandi-dark">小森林兒科診所</h1>
+                     <div class="bg-white/80 p-2 rounded-full shadow-sm backdrop-blur-sm">
+                        <i class="fa-solid fa-child-reaching text-morandi-dark text-lg"></i>
+                     </div>
+                </div>
+                
+                <div class="inline-block relative">
+                    <span class="text-xs md:text-sm text-text-main font-medium bg-white/60 py-1 px-4 rounded-full backdrop-blur-md shadow-sm border border-white/50">
+                        <i class="fa-solid fa-location-dot text-red-400 mr-1"></i>
+                        關東熱海箱根・花火大會 5日遊
+                        <i class="fa-solid fa-fire text-orange-400 ml-1"></i>
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Date Navigation -->
+        <div class="bg-white border-b border-morandi-light">
+            <div class="container mx-auto max-w-2xl py-3 px-2">
+                <div class="flex overflow-x-auto space-x-3 pb-1 scrollbar-hide" id="date-tabs">
+                    <!-- Tabs will be injected by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scrollable Main Content -->
+    <!-- flex-grow makes it take remaining space, overflow-y-auto enables internal scrolling -->
+    <main id="main-content" class="flex-grow overflow-y-auto bg-cream-light relative w-full">
+        <div class="container mx-auto max-w-2xl p-4 min-h-full pb-20">
+            <div id="itinerary-container">
+                <!-- Itinerary content will be injected by JS -->
+            </div>
+            
+             <!-- Footer inside scrollable area -->
+            <footer class="text-text-main py-6 mt-8 text-center text-sm opacity-70">
+                <p class="font-medium"><i class="fa-solid fa-suitcase-rolling mr-2"></i>山富國際旅行社</p>
+                <p class="text-xs mt-1 text-text-light">行程可能因實際交通與氣候狀況調整</p>
+            </footer>
+        </div>
+    </main>
+
+    <script>
+        // Data Structure extracted from PDF - Restructured meals to be chronological
+        const itineraryData = [
+            {
+                id: 'day1',
+                date: '5/23',
+                day: '週六',
+                title: '啟程・橫濱風情',
+                items: [
+                    {
+                        type: 'flight',
+                        time: '08:30 / 10:40',
+                        title: '桃園國際機場 ✈ 東京成田機場',
+                        desc: '搭乘星宇航空 JX800 (08:30/12:55) 或 JX802 (10:40/15:05) 前往東京。',
+                        icon: 'fa-plane-departure'
+                    },
+                    {
+                        type: 'meal',
+                        time: '午餐',
+                        title: '機上簡餐',
+                        desc: '機上享用簡餐 + 花壽司 + 飲料 (¥1500)',
+                        icon: 'fa-utensils'
+                    },
+                    {
+                        type: 'transport',
+                        time: '下午',
+                        title: '前往橫濱',
+                        desc: '車程約1.5小時，途經著名的「橫濱跨海大橋」欣賞港灣美景。',
+                        icon: 'fa-bus'
+                    },
+                    {
+                        type: 'activity',
+                        time: '傍晚',
+                        title: '飯店 Check-in & 橫濱自由逛街',
+                        desc: '入住飯店後自由活動。推薦前往橫濱港未來21、紅磚倉庫或中華街探索美食與夜景。',
+                        icon: 'fa-city'
+                    },
+                    {
+                        type: 'meal',
+                        time: '晚餐',
+                        title: '推薦：橫濱熱門餐廳 (自理)',
+                        desc: `
+                            <div class="rec-item">
+                                <div class="font-bold text-gray-700">🍜 萬珍樓 (Manchinro)</div>
+                                <div class="text-xs text-gray-500 mb-1">中華街百年粵菜老店，裝潢華麗，Google 評論 4000+。</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Manchinro+Yokohama" target="_blank" class="rec-link">
+                                    <i class="fa-solid fa-map-location-dot mr-1"></i> 導航去
+                                </a>
+                            </div>
+                            <div class="rec-item">
+                                <div class="font-bold text-gray-700">🥞 Bills 橫濱紅磚倉庫</div>
+                                <div class="text-xs text-gray-500 mb-1">來自澳洲的「世界第一早餐」，晚餐氣氛佳，可賞夜景。Google 評論 2000+。</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Bills+Yokohama+Red+Brick+Warehouse" target="_blank" class="rec-link">
+                                    <i class="fa-solid fa-map-location-dot mr-1"></i> 導航去
+                                </a>
+                            </div>
+                        `,
+                        icon: 'fa-burger'
+                    },
+                    {
+                        type: 'hotel',
+                        title: '住宿',
+                        desc: '橫濱東急REI飯店 / MYSTAYS 橫濱關內酒店 / APA HOTEL YOKOHAMA-KANNAI 或同級',
+                        icon: 'fa-bed'
+                    }
+                ]
+            },
+            {
+                id: 'day2',
+                date: '5/24',
+                day: '週日',
+                title: '江之島・熱海花火',
+                items: [
+                    {
+                        type: 'meal',
+                        time: '早餐',
+                        title: '飯店內享用',
+                        desc: '享用豐盛的飯店早餐，開啟美好的一天。',
+                        icon: 'fa-mug-hot'
+                    },
+                    {
+                        type: 'activity',
+                        time: '上午',
+                        title: '江之島',
+                        desc: '漫步「綠色江之島」，參拜千年歷史的「江島神社」，感受湘南海岸的宗教與人文氣息。',
+                        icon: 'fa-torii-gate'
+                    },
+                    {
+                        type: 'meal',
+                        time: '午餐',
+                        title: '日式風味餐',
+                        desc: '日式定食風味餐或日式御膳料理 (餐標¥3500)',
+                        icon: 'fa-utensils'
+                    },
+                    {
+                        type: 'transport',
+                        time: '下午',
+                        title: '前往小田原 & 熱海',
+                        desc: '先至小田原飯店寄放行李，隨後前往熱海溫泉區。',
+                        icon: 'fa-suitcase'
+                    },
+                    {
+                        type: 'activity',
+                        time: '下午',
+                        title: '熱海纜車 & 溫泉街',
+                        desc: '搭乘玻璃纜車登上八幡山，眺望熱海市區與相模灣美景。隨後自由逛熱海溫泉街。',
+                        icon: 'fa-tram'
+                    },
+                    {
+                        type: 'meal',
+                        time: '晚餐',
+                        title: '推薦：熱海海鮮 (自理)',
+                        desc: `
+                            <div class="rec-item">
+                                <div class="font-bold text-gray-700">🐟 圍爐裏茶屋 (Irori Chaya)</div>
+                                <div class="text-xs text-gray-500 mb-1">熱海人氣海鮮居酒屋，招牌是鮮魚茶泡飯。Google 評論 2000+。</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Irori+Chaya+Atami" target="_blank" class="rec-link">
+                                    <i class="fa-solid fa-map-location-dot mr-1"></i> 導航去
+                                </a>
+                            </div>
+                            <div class="rec-item">
+                                <div class="font-bold text-gray-700">🍣 Maguroya (まぐろや)</div>
+                                <div class="text-xs text-gray-500 mb-1">熱海站前高CP值海鮮丼飯，鮪魚料理專門。Google 評論 1000+。</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Maguroya+Atami" target="_blank" class="rec-link">
+                                    <i class="fa-solid fa-map-location-dot mr-1"></i> 導航去
+                                </a>
+                            </div>
+                        `,
+                        icon: 'fa-burger'
+                    },
+                    {
+                        type: 'highlight',
+                        time: '20:30',
+                        title: '熱海海上花火大會',
+                        desc: '熱海灣特殊的「天然劇場」地形，欣賞魄力十足的煙火倒映在海面上。',
+                        icon: 'fa-fireworks', 
+                        specialClass: 'border-l-pink-400' 
+                    },
+                    {
+                        type: 'transport',
+                        time: '晚間',
+                        title: '返回小田原',
+                        desc: '搭乘 JR (熱海-小田原) 返回飯店 Check-in。',
+                        icon: 'fa-train'
+                    },
+                    {
+                        type: 'hotel',
+                        title: '住宿',
+                        desc: '天成園 小田原駅別館 / 小田原站東口東橫INN 或同級',
+                        icon: 'fa-bed'
+                    }
+                ]
+            },
+            {
+                id: 'day3',
+                date: '5/25',
+                day: '週一',
+                title: '箱根絕景・海盜船',
+                items: [
+                     {
+                        type: 'meal',
+                        time: '早餐',
+                        title: '飯店內享用',
+                        desc: '享用飯店早餐。',
+                        icon: 'fa-mug-hot'
+                    },
+                    {
+                        type: 'activity',
+                        time: '上午',
+                        title: '箱根登山鐵道 & 斜面電車',
+                        desc: '體驗著名的箱根登山鐵道 (箱根湯本-強羅) 及斜面電車 (強羅-早雲山)。',
+                        icon: 'fa-train-subway'
+                    },
+                    {
+                        type: 'activity',
+                        time: '上午',
+                        title: '箱根空中纜車 & 大涌谷',
+                        desc: '俯瞰蘆之湖與富士山全景，參觀火山遺跡「大涌谷」(大地獄)。',
+                        icon: 'fa-mountain'
+                    },
+                    {
+                        type: 'meal',
+                        time: '午餐',
+                        title: '日式御膳',
+                        desc: '日式御膳料理 (餐標¥3500)',
+                        icon: 'fa-utensils'
+                    },
+                    {
+                        type: 'activity',
+                        time: '下午',
+                        title: '蘆之湖海盜船',
+                        desc: '搭乘豪華海盜船遊覽蘆之湖，欣賞湖光山色與富士山倒影。',
+                        icon: 'fa-ship'
+                    },
+                    {
+                        type: 'activity',
+                        time: '下午',
+                        title: '箱根神社',
+                        desc: '參拜開運之神，必拍景點：矗立在湖水上的「平和的鳥居」。',
+                        icon: 'fa-camera'
+                    },
+                    {
+                        type: 'transport',
+                        time: '傍晚',
+                        title: '前往東京',
+                        desc: '結束箱根行程，專車前往東京市區。',
+                        icon: 'fa-bus'
+                    },
+                    {
+                        type: 'meal',
+                        time: '晚餐',
+                        title: '日式和牛燒肉',
+                        desc: '日式和牛燒肉吃到飽 (加贈軟性飲料喝到飽) (餐標¥4000)',
+                        icon: 'fa-fire-burner'
+                    },
+                    {
+                        type: 'hotel',
+                        title: '住宿',
+                        desc: '池袋太陽城王子 / 上野CANDEO / 新宿華盛頓 / 品川王子 或同級',
+                        icon: 'fa-bed'
+                    }
+                ]
+            },
+            {
+                id: 'day4',
+                date: '5/26',
+                day: '週二',
+                title: '東京・自由探索',
+                items: [
+                    {
+                        type: 'meal',
+                        time: '早餐',
+                        title: '飯店內享用',
+                        desc: '享用飯店早餐。',
+                        icon: 'fa-mug-hot'
+                    },
+                    {
+                        type: 'activity',
+                        time: '全日',
+                        title: '東京自由活動',
+                        desc: '全日自由活動。您可以自行前往澀谷、新宿、銀座逛街，或造訪東京迪士尼樂園、淺草寺等景點。',
+                        icon: 'fa-person-walking-luggage'
+                    },
+                    {
+                        type: 'meal',
+                        time: '午餐',
+                        title: '推薦：東京人氣美食 (自理)',
+                        desc: `
+                            <div class="rec-item">
+                                <div class="font-bold text-gray-700">🍜 無敵家拉麵 (Mutekiya)</div>
+                                <div class="text-xs text-gray-500 mb-1">池袋排隊傳奇，濃厚豚骨拉麵，Google 評論 12000+。</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Mutekiya+Ramen+Ikebukuro" target="_blank" class="rec-link">
+                                    <i class="fa-solid fa-map-location-dot mr-1"></i> 池袋導航
+                                </a>
+                            </div>
+                            <div class="rec-item">
+                                <div class="font-bold text-gray-700">🥩 淺草炸牛排 (Asakusa Gyukatsu)</div>
+                                <div class="text-xs text-gray-500 mb-1">淺草雷門對面，酥脆軟嫩的炸牛排，Google 評論 6000+。</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Asakusa+Gyukatsu" target="_blank" class="rec-link">
+                                    <i class="fa-solid fa-map-location-dot mr-1"></i> 淺草導航
+                                </a>
+                            </div>
+                        `,
+                        icon: 'fa-burger'
+                    },
+                    {
+                        type: 'meal',
+                        time: '晚餐',
+                        title: '推薦：新宿/上野美食 (自理)',
+                        desc: `
+                            <div class="rec-item">
+                                <div class="font-bold text-gray-700">🍜 風雲兒 (Fuunji)</div>
+                                <div class="text-xs text-gray-500 mb-1">新宿最強沾麵之一，濃郁雞白湯魚介，Google 評論 4000+。</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Fuunji+Ramen+Shinjuku" target="_blank" class="rec-link">
+                                    <i class="fa-solid fa-map-location-dot mr-1"></i> 新宿導航
+                                </a>
+                            </div>
+                            <div class="rec-item">
+                                <div class="font-bold text-gray-700">🐟 伊豆榮 本店 (Izuei)</div>
+                                <div class="text-xs text-gray-500 mb-1">上野300年歷史鰻魚飯老舖，傳統美味，Google 評論 2000+。</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Izuei+Main+Branch+Ueno" target="_blank" class="rec-link">
+                                    <i class="fa-solid fa-map-location-dot mr-1"></i> 上野導航
+                                </a>
+                            </div>
+                        `,
+                        icon: 'fa-burger'
+                    },
+                    {
+                        type: 'hotel',
+                        title: '住宿',
+                        desc: '池袋太陽城王子 / 上野CANDEO / 新宿華盛頓 / 品川王子 或同級 (續住)',
+                        icon: 'fa-bed'
+                    }
+                ]
+            },
+            {
+                id: 'day5',
+                date: '5/27',
+                day: '週三',
+                title: '滿載而歸',
+                items: [
+                    {
+                        type: 'meal',
+                        time: '上午',
+                        title: '早餐時光',
+                        desc: '享受飯店早餐，整理行囊。',
+                        icon: 'fa-mug-hot'
+                    },
+                    {
+                        type: 'meal',
+                        time: '午餐',
+                        title: '機上簡餐',
+                        desc: '於回程班機上享用。',
+                        icon: 'fa-utensils'
+                    },
+                    {
+                        type: 'flight',
+                        time: '14:10 / 16:20',
+                        title: '東京成田機場 ✈ 桃園國際機場',
+                        desc: '前往機場搭機返台。<br>星宇航空 JX801 (14:10/16:50) 或 JX803 (16:20/19:00)',
+                        icon: 'fa-plane-arrival'
+                    },
+                    {
+                        type: 'end',
+                        title: '溫暖的家',
+                        desc: '平安抵達，期待下次相聚！',
+                        icon: 'fa-house'
+                    }
+                ]
+            }
+        ];
+
+        // Init function
+        function initApp() {
+            renderTabs();
+            // Default to first day
+            switchTab(0);
+        }
+
+        function renderTabs() {
+            const tabsContainer = document.getElementById('date-tabs');
+            let html = '';
+            itineraryData.forEach((day, index) => {
+                html += `
+                    <button onclick="switchTab(${index})" id="tab-${index}" 
+                        class="tab-inactive flex-shrink-0 px-4 py-2 rounded-full text-sm transition-all duration-200 flex flex-col items-center justify-center min-w-[70px]">
+                        <span class="font-bold text-xs">${day.date}</span>
+                        <span class="text-[10px]">${day.day}</span>
+                    </button>
+                `;
+            });
+            tabsContainer.innerHTML = html;
+        }
+
+        function renderItinerary(dayIndex) {
+            const container = document.getElementById('itinerary-container');
+            const data = itineraryData[dayIndex];
+            
+            let itemsHtml = '';
+            data.items.forEach((item, idx) => {
+                // Adjust icon color or class based on type if needed
+                let iconColorClass = 'text-morandi';
+                let cardClass = '';
+                
+                if (item.type === 'flight') iconColorClass = 'text-blue-400';
+                if (item.type === 'highlight') iconColorClass = 'text-pink-400';
+                if (item.type === 'meal') {
+                    iconColorClass = 'text-yellow-500';
+                    cardClass = 'card-meal'; // Use yellow border for meals
+                }
+
+                // Fix for font awesome fireworks icon mapping if needed, or stick to default
+                let iconClass = `fa-solid ${item.icon} ${iconColorClass}`;
+                
+                // Allow overriding border color via data
+                let borderClass = item.specialClass ? item.specialClass : (item.type === 'meal' ? 'border-l-yellow-300' : 'border-l-morandi');
+
+                itemsHtml += `
+                    <div class="relative pl-6 pb-6 last:pb-0">
+                        <!-- Timeline connector -->
+                        ${idx !== data.items.length - 1 ? '<div class="timeline-line"></div>' : ''}
+                        
+                        <!-- Timeline Dot -->
+                        <div class="absolute left-0 top-6 w-10 h-1 z-10 flex items-center justify-center">
+                             <!-- Dot is handled by card border or we can add a specific dot -->
+                        </div>
+
+                        <!-- Card -->
+                        <div class="card p-5 ${borderClass} ${cardClass}">
+                            <div class="flex items-start">
+                                <div class="mr-4 mt-1 bg-cream-dark p-2 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0">
+                                    <i class="${iconClass} text-lg"></i>
+                                </div>
+                                <div class="flex-grow w-full">
+                                    ${item.time ? `<span class="inline-block bg-morandi-light text-morandi-dark text-[10px] px-2 py-0.5 rounded mb-1 font-bold">${item.time}</span>` : ''}
+                                    <h3 class="font-bold text-lg text-text-main mb-1">${item.title}</h3>
+                                    <div class="text-sm text-text-light leading-relaxed">${item.desc}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const html = `
+                <div class="fade-in">
+                    <div class="mb-6 ml-2">
+                        <h2 class="text-2xl font-bold text-morandi-dark flex items-center gap-2">
+                            ${data.title}
+                            <i class="fa-solid fa-leaf text-morandi-light text-lg"></i>
+                        </h2>
+                        <div class="h-1 w-16 bg-morandi mt-2 rounded"></div>
+                    </div>
+                    <div class="relative">
+                       ${itemsHtml}
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function switchTab(index) {
+            // Update Tab Styles
+            itineraryData.forEach((_, idx) => {
+                const btn = document.getElementById(`tab-${idx}`);
+                if (idx === index) {
+                    btn.classList.remove('tab-inactive');
+                    btn.classList.add('tab-active');
+                    // Optional: scale effect
+                    btn.classList.add('scale-105');
+                } else {
+                    btn.classList.add('tab-inactive');
+                    btn.classList.remove('tab-active');
+                    btn.classList.remove('scale-105');
+                }
+            });
+
+            // Update Content
+            renderItinerary(index);
+            
+            // Scroll to top of content container
+            document.getElementById('main-content').scrollTop = 0;
+            
+             // Scroll selected tab into view
+            const selectedTab = document.getElementById(`tab-${index}`);
+            selectedTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initApp);
+
+    </script>
+</body>
+</html>
